@@ -1,69 +1,62 @@
-# React + TypeScript + Vite
+# MoneyOUT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React expense dashboard that integrates with the Expensify API through a small Vercel serverless proxy.
 
-Currently, two official plugins are available:
+The project demonstrates third-party API integration, transaction normalisation, client-side reporting, CSV workflows, and responsive UI development. It is a portfolio project and demo application, not an online bank or production accounting product.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Implemented features
 
-## Expanding the ESLint configuration
+- Authenticate against the Expensify API using a demonstration account
+- Retrieve and normalise transaction records into one client-side model
+- Display total spend, transaction count, recent activity, average transaction value, and top merchant
+- Search transactions by merchant, category, or comment
+- Filter by category and date range
+- Create new transactions
+- Import transactions from CSV with a preview step
+- Export the filtered transaction set to CSV
+- Refresh upstream data after writes
+- Responsive dashboard and documentation views
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Architecture
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+React client
+    |
+    | JSON over HTTPS
+    v
+Vercel Node serverless function (/api/proxy)
+    |
+    | application/x-www-form-urlencoded
+    v
+Expensify API
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Frontend
+
+The frontend uses React, Vite, React Router, Tailwind CSS, and Lucide icons. Transactions are normalised into a stable client-side shape before being displayed or analysed.
+
+### API proxy
+
+`api/proxy.js` accepts a small command payload, converts it into the form-encoded structure expected by Expensify, forwards the request, and returns a normalised JSON response to the browser.
+
+The proxy exists to keep partner-level configuration out of the browser and to avoid client-side cross-origin issues. Expensify remains the system of record; this project does not maintain its own database.
+
+## Transaction model
 
 ```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+{
+  id: string,
+  date: "YYYY-MM-DD",
+  merchant: string,
+  amountCents: number,
+  currency: string,
+  category: string,
+  comment: string
+}
 ```
+
+Amounts are represented in integer minor units in the client model to avoid floating-point formatting errors in UI calculations.
+
+## Authentication and security boundary
+
+The current version stores the returned Expensify auth token in a cookie created by browser JavaScript. On HTTPS, the helper adds `Secure` and `SameSite=Lax`, but the cookie **is not HttpOnly

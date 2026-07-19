@@ -22,7 +22,7 @@ export default function Documentation() {
           <div className="space-y-6">
             <div>
               <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Adesanya Banking — Overview & Build Notes
+                MoneyOUT — Overview & Build Notes
               </h1>
               <p className="mt-2 max-w-3xl text-slate-600">
                 A technical walk-through of the demo: architecture, data model,
