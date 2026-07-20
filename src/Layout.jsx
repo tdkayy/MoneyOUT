@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Github, Menu, ReceiptText, X } from "lucide-react";
 
-const REPOSITORY_URL = "https://github.com/tdkayy/expense-management-dashboard";
+const REPOSITORY_URL = "https://github.com/tdkayy/MoneyOUT";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -27,7 +27,7 @@ export default function Layout({ children }) {
               <ReceiptText className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-base font-bold leading-tight">Expense Manager</div>
+              <div className="text-base font-bold leading-tight">MoneyOUT</div>
               <div className="text-[11px] text-slate-500">Transactions, imports and spending summaries</div>
             </div>
           </Link>
@@ -64,7 +64,7 @@ export default function Layout({ children }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 font-semibold">
                 <ReceiptText className="h-6 w-6" />
-                Expense Manager
+                MoneyOUT
               </div>
               <button type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
                 <X className="h-7 w-7" />
